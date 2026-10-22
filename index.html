@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>牙技新手村 - Retro Gameboy Edition</title>
+<!-- 引入復古像素風字型 -->
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=DotGothic16&display=swap" rel="stylesheet">
+<style>
+body {
+  font-family: 'DotGothic16', 'Courier New', monospace;
+  text-align: center;
+  margin-top: 40px;
+  background-color: #ffffff;
+  color: #000000;
+  image-rendering: pixelated;
+}
+
+/* 像素風標題 */
+h1, h2 {
+  font-family: 'Press Start 2P', 'DotGothic16', monospace;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #000000;
+}
+
+h1 {
+  font-size: 22px;
+  margin-bottom: 25px;
+}
+
+/* 像素風按鈕 */
+button {
+  font-family: 'DotGothic16', monospace;
+  font-size: 20px;
+  font-weight: bold;
+  margin: 10px;
+  padding: 12px 24px;
+  background-color: #ffffff;
+  color: #000000;
+  border: 4px solid #000000;
+  box-shadow: 4px 4px #000000;
+  border-radius: 0px;
+  cursor: pointer;
+  transition: none;
+}
+
+button:hover {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+button:active {
+  transform: translate(4px, 4px);
+  box-shadow: 0px 0px #000000;
+}
+
+button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: 4px 4px #000000 !important;
+}
+
+/* 像素風登入註冊外框 */
+.auth-container {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 30px;
+  border: 4px solid #000000;
+  box-shadow: 8px 8px #000000;
+  background-color: #ffffff;
+}
+
+.auth-container h2 {
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #000000;
+}
+
+.auth-container input {
+  font-family: 'DotGothic16', monospace;
+  font-size: 18px;
+  padding: 10px;
+  border: 3px solid #000000;
+  background-color: #ffffff;
+  color: #000000;
+  margin: 10px 0;
+  width: 80%;
+  text-align: center;
+  outline: none;
+}
+
+.auth-container button {
+  font-size: 16px;
+  padding: 10px 20px;
+  margin: 8px 5px;
+}
+
+.fragment-container {
+  display: inline-block;
+  text-align: center;
+}
+
+/* 像素風碎片卡片 */
+.fragment {
+  display: inline-block;
+  margin: 10px;
+  border: 4px solid #000000;
+  box-shadow: 4px 4px #000000;
+  width: 40vw; 
+  height: 40vw;
+  max-width: 350px;
+  max-height: 350px;
+  border-radius: 0px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #ffffff;
+}
+
+.correct {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+.wrong {
+  background-color: #888888 !important;
+  color: #000000 !important;
+}
+
+.fragment canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* 像素風彈窗 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    width: 80%;
+    height: 80%;
+    background-color: #ffffff;
+    border: 4px solid #000000;
+    box-shadow: 8px 8px #000000;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 16px;
+    padding: 8px 12px;
+    cursor: pointer;
+    background: #000000;
+    border: 3px solid #000000;
+    color: white;
+    box-shadow: 2px 2px #000000;
+}
+
+/* 像素風選項按鈕 */
+.option-btn {
+    display: block;
+    width: 80%;
+    max-width: 600px;
+    margin: 12px auto;
+    padding: 12px 18px;
+    font-size: 20px !important;
+    border: 3px solid #000000;
+    box-shadow: 4px 4px #000000;
+    background-color: #ffffff;
+    color: #000000;
+    text-align: left;
+    cursor: pointer;
+}
+.option-btn:hover {
+    background-color: #000000;
+    color: #ffffff;
+}
+.option-btn:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0px 0px #000000;
+}
+
+.question-block h3 {
+    font-size: 20px;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+</style>
+</head>
+<body>
+
+<div id="authBox" class="auth-container">
+  <h2>[ 牙技新手村 ]<br>登入系統</h2>
+  <input id="username" placeholder="請輸入帳號 (暱稱)">
+  <br>
+  <input id="password" type="password" placeholder="請輸入密碼">
+  <br><br>
+  <button onclick="login()">開始冒險</button>
+  <button onclick="signup()">建立角色</button>
+</div>
+
+<div id="gameUI" style="display:none;">
+    <h1 id="gameTitle">牙技新手村</h1>
+    <div id="scene"></div>
+    <div id="buttons"></div>
+    <div id="fragments"></div>
+</div>
+
+<script src="questions.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+let currentUser = "";
+let player = { fragments: [] };
+let currentQuestion = 0;
+let currentQuestions = [];
+let correctCount = 0;
+let wrongAnswers = [];
+
+let wrongPracticeList = [];
+let wrongPracticeIndex = 0;
+
+window.onload = function () {
+    document.getElementById("authBox").style.display = "block";
+    document.getElementById("gameUI").style.display = "none";
+};
+
+function signup() {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    
+    if (!user || !pass) {
+        alert("請輸入完整的帳號與密碼！");
+        return;
+    }
+    
+    let usersList = JSON.parse(localStorage.getItem("dental_users_list")) || {};
+    
+    if (usersList[user]) {
+        alert("此帳號已被註冊！");
+        return;
+    }
+    
+    usersList[user] = pass;
+    localStorage.setItem("dental_users_list", JSON.stringify(usersList));
+    
+    const userSaveKey = `dental_save_data_${user}`;
+    const initialData = { fragments: [], wrongAnswers: [] };
+    localStorage.setItem(userSaveKey, JSON.stringify(initialData));
+    
+    alert("角色建立成功！已自動登入。");
+    currentUser = user;
+    enterGame();
+    loadUserData();
+}
+
+function login() {
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+    
+    if (!user || !pass) {
+        alert("請輸入帳號與密碼！");
+        return;
+    }
+    
+    let usersList = JSON.parse(localStorage.getItem("dental_users_list")) || {};
+    
+    if (!usersList[user]) {
+        alert("找不到此角色，請先建立角色！");
+        return;
+    }
+    
+    if (usersList[user] !== pass) {
+        alert("密碼錯誤！");
+        return;
+    }
+    
+    currentUser = user;
+    enterGame();
+    loadUserData();
+}
+
+function enterGame() {
+    document.getElementById("authBox").style.display = "none";
+    document.getElementById("gameUI").style.display = "block";
+    document.getElementById("gameTitle").innerText = `LV.1 玩家: ${currentUser}`;
+}
+
+function logout() {
+    if(confirm("確定要登出並返回標題畫面嗎？")) {
+        location.reload();
+    }
+}
+
+function loadUserData() {
+    const userSaveKey = `dental_save_data_${currentUser}`;
+    const savedData = localStorage.getItem(userSaveKey);
+    
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            player.fragments = data.fragments || [];
+            wrongAnswers = data.wrongAnswers || [];
+        } catch (e) {
+            console.error("讀取存檔失敗", e);
+            player.fragments = [];
+            wrongAnswers = [];
+        }
+    } else {
+        player.fragments = [];
+        wrongAnswers = [];
+    }
+    showHomepage();
+}
+
+function saveUserData() {
+    if (!currentUser) return;
+    const userSaveKey = `dental_save_data_${currentUser}`;
+    const dataToSave = {
+        fragments: player.fragments,
+        wrongAnswers: wrongAnswers
+    };
+    localStorage.setItem(userSaveKey, JSON.stringify(dataToSave));
+}
+
+function renderSTL(element, stlPath, enableControls = true) {
+    const containerWidth = element.clientWidth;
+    const containerHeight = element.clientHeight;
+    if (containerWidth === 0 || containerHeight === 0) return;
+
+    while (element.firstChild) {
+        element.removeChild(element.firstChild);
+    }
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xffffff);
+
+    const camera = new THREE.PerspectiveCamera(75, containerWidth / containerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialiasing: false, alpha: true });
+    renderer.setSize(containerWidth, containerHeight);
+    element.appendChild(renderer.domElement);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    directionalLight.position.set(0, 1, 1);
+    scene.add(directionalLight);
+
+    const loader = new THREE.STLLoader();
+    loader.load(stlPath, function(geometry) {
+        // 維持原本的灰階模型金屬質感色調 (0xAAAAAA)
+        const material = new THREE.MeshPhongMaterial({ color: 0xAAAAAA, specular: 0x111111, shininess: 200 });
+        const mesh = new THREE.Mesh(geometry, material);
+        mesh.rotation.x = -Math.PI / 2;
+
+        const box = new THREE.Box3().setFromObject(mesh);
+        const center = box.getCenter(new THREE.Vector3());
+        mesh.position.sub(center);
+
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = camera.fov * (Math.PI / 180);
+        let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2)) * 1.5;
+        camera.position.z = cameraZ;
+
+        scene.add(mesh);
+
+        if (enableControls) {
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.25;
+            controls.enablePan = true;
+            controls.enableZoom = true;
+            controls.target.copy(center);
+            controls.update();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+            animate();
+        } else {
+            renderer.render(scene, camera);
+        }
+    }, undefined, function(error) {
+        console.error('STL 載入失敗:', error);
+        element.innerHTML = '載入模型失敗';
+    });
+}
+
+function cleanupDynamicContent() {
+    const wrongAnswersList = document.getElementById("wrong-answers-list");
+    if (wrongAnswersList) wrongAnswersList.remove();
+}
+
+function showHomepage() {
+    cleanupDynamicContent();
+    document.getElementById("scene").innerHTML = "";
+    document.getElementById("fragments").innerHTML = "";
+    document.getElementById("buttons").innerHTML = `
+        <div>
+            <button onclick="showLevelSelect()">▶ 開始冒險</button>
+            <button onclick="openCollection()">📦 收藏冊</button>
+            <button onclick="showWrongAnswersMenu()">📖 錯題本</button>
+        </div>
+        <br><br>
+        <div>
+            <button onclick="logout()">登出遊戲</button>
+        </div>
+    `;
+}
+
+function showLevelSelect() {
+    cleanupDynamicContent();
+    document.getElementById("scene").innerHTML = `<h2 style="font-size: 22px; margin: 15px 0;">選擇冒險關卡</h2>`;
+    document.getElementById("buttons").innerHTML = `
+        <button onclick="startGame('level1')">關卡（一）</button>
+        <button onclick="startGame('level2')">關卡（二）</button>
+        <button onclick="startGame('level3')">關卡（三）</button>
+        <button onclick="startGame('level4')">關卡（四）</button>
+        <br><br>
+        <button onclick="showHomepage()">返回主選單</button>
+    `;
+}
+
+function startGame(level) {
+    currentQuestions = (typeof allQuestions !== 'undefined' && allQuestions[level]) ? allQuestions[level] : (allQuestions['level1'] || []);
+    currentQuestion = 0;
+    correctCount = 0;
+    showQuestion(level);
+}
+
+function showQuestion(level) {
+    if (!currentQuestions || currentQuestions.length === 0) {
+        alert("此關卡目前沒有題目！");
+        showLevelSelect();
+        return;
+    }
+    const q = currentQuestions[currentQuestion];
+    document.getElementById("scene").innerHTML = `
+        <div style="font-size: 14px; margin-bottom: 8px; font-family: 'Press Start 2P';">QUEST ${currentQuestion + 1}/${currentQuestions.length}</div>
+        <div style="font-size: 22px; max-width: 800px; margin: 0 auto; padding: 0 20px;">${q.question}</div>
+    `;
+
+    let btns = "";
+    q.options.forEach(opt => {
+        btns += `<button class="option-btn" onclick="answer(this, '${opt}', '${level}')">${opt}</button>`;
+    });
+    document.getElementById("buttons").innerHTML = btns;
+}
+
+function answer(btn, ans, level) {
+    const q = currentQuestions[currentQuestion];
+    const buttons = document.querySelectorAll("#buttons button.option-btn");
+
+    buttons.forEach(b => {
+        if(b.textContent === q.answer) b.classList.add("correct");
+    });
+
+    if(ans !== q.answer){
+        btn.classList.add("wrong");
+        if (!wrongAnswers.some(item => item.question === q.question)) {
+            q.level = level;
+            wrongAnswers.push(q);
+            saveUserData();
+        }
+    } else {
+        correctCount++;
+    }
+
+    buttons.forEach(b => b.disabled = true);
+
+    setTimeout(() => {
+        currentQuestion++;
+        if(currentQuestion >= currentQuestions.length){
+            let total = currentQuestions.length;
+            alert(`關卡結束！答對 ${correctCount} / ${total} 題`);
+
+            if(correctCount === total){
+                const allPossibleFragments = [
+                    "./nt/11-1.stl",
+                    "./nt/11-2.stl",
+                    "./nt/12-1.stl",
+                    "./nt/12-2.stl"
+                ];
+
+                const unownedFragments = allPossibleFragments.filter(frag => {
+                    return !player.fragments.some(f => f.file === frag);
+                });
+
+                if (unownedFragments.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * unownedFragments.length);
+                    const rewardFile = unownedFragments[randomIndex];
+
+                    player.fragments.push({ id: Date.now(), file: rewardFile, type: rewardFile });
+                    saveUserData();
+                    alert(`🎉 全對！獲得隨機新碎片`);
+                } else {
+                    alert(`🎉 全對！不過所有碎片你都已经收集齊全囉！`);
+                }
+            } else {
+                alert(`挑戰失敗～再接再厲！`);
+            }
+            showLevelSelect();
+        } else {
+            showQuestion(level);
+        }
+    }, 1000);
+}
+
+function openCollection() {
+    cleanupDynamicContent();
+    document.getElementById("scene").innerHTML = `<div style="font-size: 18px; margin: 15px 0;">點擊碎片預覽模型 / 勾選兩個碎片進行合成！</div>`;
+    renderFragments();
+    document.getElementById("buttons").innerHTML = `
+        <button onclick="combineFragments()">✨ 合成碎片</button>
+        <button onclick="showHomepage()">返回主選單</button>
+    `;
+}
+
+function renderFragments() {
+    const fragmentsDiv = document.getElementById("fragments");
+    fragmentsDiv.innerHTML = "";
+    
+    player.fragments.forEach(f => {
+        const fragmentContainer = document.createElement("div");
+        fragmentContainer.className = "fragment-container";
+        
+        const div = document.createElement("div");
+        div.className = "fragment";
+        div.dataset.id = f.id;
+        div.dataset.type = f.type;
+        div.addEventListener('click', () => showFragmentDetail(f.file));
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = "fragment-select";
+        checkbox.dataset.id = f.id;
+        checkbox.style.marginTop = '8px';
+        checkbox.style.transform = 'scale(1.5)';
+        checkbox.style.cursor = 'pointer';
+        
+        fragmentContainer.appendChild(div);
+        fragmentContainer.appendChild(document.createElement("br"));
+        fragmentContainer.appendChild(checkbox);
+        fragmentsDiv.appendChild(fragmentContainer);
+
+        setTimeout(() => {
+          renderSTL(div, f.file, false);
+        }, 10);
+    });
+}
+
+function showFragmentDetail(stlPath) {
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal-content';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'modal-close';
+    closeBtn.textContent = 'X';
+    closeBtn.onclick = () => document.body.removeChild(modal);
+
+    modal.appendChild(modalContent);
+    modal.appendChild(closeBtn);
+    document.body.appendChild(modal);
+
+    setTimeout(() => {
+        renderSTL(modalContent, stlPath, true);
+    }, 10);
+}
+
+function combineFragments() {
+    const selectedCheckboxes = document.querySelectorAll('input[name="fragment-select"]:checked');
+    if (selectedCheckboxes.length !== 2) {
+        alert("請精確選擇兩個碎片進行合成！");
+        return;
+    }
+
+    const selectedTypes = Array.from(selectedCheckboxes).map(checkbox => {
+        const fragmentId = parseInt(checkbox.dataset.id);
+        const fragment = player.fragments.find(f => f.id === fragmentId);
+        return fragment ? fragment.file : null;
+    });
+
+   const isFragment11_1 = selectedTypes.some(t => t && t.includes("11-1"));
+   const isFragment11_2 = selectedTypes.some(t => t && t.includes("11-2"));
+   
+   const isFragment12_1 = selectedTypes.some(t => t && t.includes("12-1"));
+   const isFragment12_2 = selectedTypes.some(t => t && t.includes("12-2"));
+   
+   if (isFragment11_1 && isFragment11_2) {
+        selectedCheckboxes.forEach(checkbox => {
+            const id = parseInt(checkbox.dataset.id);
+            player.fragments = player.fragments.filter(f => f.id !== id);
+        });
+        
+        player.fragments.push({ id: Date.now(), file: "./nt/11.stl", type: "./nt/11.stl" });
+        saveUserData();
+        
+        alert("合成成功！獲得完整牙齒 11！");
+        renderFragments();
+   } else if (isFragment12_1 && isFragment12_2) {
+        selectedCheckboxes.forEach(checkbox => {
+            const id = parseInt(checkbox.dataset.id);
+            player.fragments = player.fragments.filter(f => f.id !== id);
+        });
+        
+        player.fragments.push({ id: Date.now(), file: "./nt/12.stl", type: "./nt/12.stl" });
+        saveUserData();
+        
+        alert("合成成功！獲得完整牙齒 12！");
+        renderFragments();
+    } else {
+        alert("合成失敗！碎片配對錯誤！");
+    }
+}
+
+function getQuestionLevel(q) {
+    if (q.level) return q.level;
+    for (let lvl in allQuestions) {
+        if (allQuestions[lvl].some(item => item.question === q.question)) {
+            return lvl;
+        }
+    }
+    return 'level1';
+}
+
+function showWrongAnswersMenu() {
+    cleanupDynamicContent();
+    document.getElementById("fragments").innerHTML = "";
+
+    if (!wrongAnswers || wrongAnswers.length === 0) {
+        document.getElementById("scene").innerHTML = `<div style="font-size: 20px; margin: 20px 0;">錯題本是空的！太棒了，沒有需要複習的錯題！</div>`;
+        document.getElementById("buttons").innerHTML = `<button onclick="showHomepage()">返回主選單</button>`;
+        return;
+    }
+
+    const count1 = wrongAnswers.filter(q => getQuestionLevel(q) === 'level1').length;
+    const count2 = wrongAnswers.filter(q => getQuestionLevel(q) === 'level2').length;
+    const count3 = wrongAnswers.filter(q => getQuestionLevel(q) === 'level3').length;
+    const count4 = wrongAnswers.filter(q => getQuestionLevel(q) === 'level4').length;
+    const totalCount = wrongAnswers.length;
+
+    document.getElementById("scene").innerHTML = `<h2 style="font-size: 22px; margin: 15px 0;">📖 錯題本</h2><p style="font-size: 16px; margin-bottom: 10px;">選擇要特訓的範圍：</p>`;
+
+    let html = `
+        <button onclick="startWrongPractice('level1')" ${count1 === 0 ? 'disabled' : ''}>第一部分錯題 (${count1})</button><br>
+        <button onclick="startWrongPractice('level2')" ${count2 === 0 ? 'disabled' : ''}>第二部分錯題 (${count2})</button><br>
+        <button onclick="startWrongPractice('level3')" ${count3 === 0 ? 'disabled' : ''}>第三部分錯題 (${count3})</button><br>
+        <button onclick="startWrongPractice('level4')" ${count4 === 0 ? 'disabled' : ''}>第四部分錯題 (${count4})</button><br>
+        <button onclick="startWrongPractice('all')">🔀 全部混合特訓 (${totalCount})</button><br><br>
+        <button onclick="showHomepage()">返回主選單</button>
+    `;
+
+    document.getElementById("buttons").innerHTML = html;
+}
+
+function startWrongPractice(category) {
+    if (category === 'all') {
+        wrongPracticeList = [...wrongAnswers].sort(() => Math.random() - 0.5);
+    } else {
+        wrongPracticeList = wrongAnswers.filter(q => getQuestionLevel(q) === category);
+    }
+
+    if (wrongPracticeList.length === 0) {
+        alert("此範圍沒有錯題！");
+        return;
+    }
+
+    wrongPracticeIndex = 0;
+    showWrongQuestionInteractive();
+}
+
+function showWrongQuestionInteractive() {
+    const q = wrongPracticeList[wrongPracticeIndex];
+
+    document.getElementById("scene").innerHTML = `
+        <div style="font-size: 14px; font-family: 'Press Start 2P'; margin-bottom: 8px;">
+            REVIEW (${wrongPracticeIndex + 1} / ${wrongPracticeList.length})
+        </div>
+        <div style="font-size: 22px; max-width: 800px; margin: 0 auto; padding: 0 20px;">${q.question}</div>
+    `;
+
+    let html = "";
+    q.options.forEach((opt) => {
+        html += `<button class="option-btn" onclick="answerWrongInteractive(this, '${opt}')">${opt}</button>`;
+    });
+
+    html += `<br><button onclick="showWrongAnswersMenu()">返回錯題選單</button>`;
+
+    document.getElementById("buttons").innerHTML = html;
+}
+
+function answerWrongInteractive(btn, selectedOpt) {
+    const q = wrongPracticeList[wrongPracticeIndex];
+    const buttons = document.querySelectorAll("#buttons button.option-btn");
+
+    buttons.forEach(b => {
+        if(b.textContent === q.answer) b.classList.add("correct");
+    });
+
+    if (selectedOpt !== q.answer) {
+        btn.classList.add("wrong");
+        alert(`❌ 答錯了！\n\n【正確答案】${q.answer}\n\n【解析】${q.explanation || '無'}`);
+        
+        setTimeout(() => {
+            wrongPracticeIndex++;
+            if (wrongPracticeIndex >= wrongPracticeList.length) {
+                alert("特訓結束！");
+                showWrongAnswersMenu();
+            } else {
+                showWrongQuestionInteractive();
+            }
+        }, 1200);
+
+    } else {
+        alert("🎉 答對了！此題已從錯題本中永久消除！");
+
+        wrongAnswers = wrongAnswers.filter(item => item.question !== q.question);
+        saveUserData();
+
+        wrongPracticeList.splice(wrongPracticeIndex, 1);
+
+        setTimeout(() => {
+            if (wrongPracticeList.length === 0) {
+                alert("✨ 太棒了！此範圍錯題全部清空！");
+                showWrongAnswersMenu();
+                return;
+            }
+            
+            if (wrongPracticeIndex >= wrongPracticeList.length) {
+                wrongPracticeIndex = 0;
+            }
+            showWrongQuestionInteractive();
+        }, 800);
+    }
+}
+</script>
+
+</body>
+</html>
