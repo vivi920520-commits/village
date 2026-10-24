@@ -208,17 +208,17 @@ button:disabled {
 <body>
 
 <div id="authBox" class="auth-container">
-  <h2>[ 牙技新手村 ]<br>登入系統</h2>
-  <input id="username" placeholder="請輸入帳號 (暱稱)">
+  <h2>牙技新手村 <br><span style="font-size: 14px; font-weight: normal;">Dental Technician Village</span> <br>登入系統 <span style="font-size: 14px; font-weight: normal;">/ Login System</span></h2>
+  <input id="username" placeholder="請輸入帳號 (暱稱) / Username">
   <br>
-  <input id="password" type="password" placeholder="請輸入密碼">
+  <input id="password" type="password" placeholder="請輸入密碼 / Password">
   <br><br>
-  <button onclick="login()">開始冒險</button>
-  <button onclick="signup()">建立角色</button>
+  <button onclick="login()">開始冒險 / Start Adventure</button>
+  <button onclick="signup()">建立角色 / Sign Up</button>
 </div>
 
 <div id="gameUI" style="display:none;">
-    <h1 id="gameTitle">牙技新手村</h1>
+    <h1 id="gameTitle">牙技新手村 / Dental Technician Village</h1>
     <div id="scene"></div>
     <div id="buttons"></div>
     <div id="fragments"></div>
@@ -250,14 +250,14 @@ function signup() {
     const pass = document.getElementById("password").value.trim();
     
     if (!user || !pass) {
-        alert("請輸入完整的帳號與密碼！");
+        alert("請輸入完整的帳號與密碼！\nPlease enter complete username and password!");
         return;
     }
     
     let usersList = JSON.parse(localStorage.getItem("dental_users_list")) || {};
     
     if (usersList[user]) {
-        alert("此帳號已被註冊！");
+        alert("此帳號已被註冊！\nThis account is already registered!");
         return;
     }
     
@@ -268,7 +268,7 @@ function signup() {
     const initialData = { fragments: [], wrongAnswers: [] };
     localStorage.setItem(userSaveKey, JSON.stringify(initialData));
     
-    alert("角色建立成功！已自動登入。");
+    alert("角色建立成功！已自動登入。\nCharacter created successfully! Logged in automatically.");
     currentUser = user;
     enterGame();
     loadUserData();
@@ -279,19 +279,19 @@ function login() {
     const pass = document.getElementById("password").value.trim();
     
     if (!user || !pass) {
-        alert("請輸入帳號與密碼！");
+        alert("請輸入帳號與密碼！\nPlease enter username and password!");
         return;
     }
     
     let usersList = JSON.parse(localStorage.getItem("dental_users_list")) || {};
     
     if (!usersList[user]) {
-        alert("找不到此角色，請先建立角色！");
+        alert("找不到此角色，請先建立角色！\nCharacter not found, please sign up first!");
         return;
     }
     
     if (usersList[user] !== pass) {
-        alert("密碼錯誤！");
+        alert("密碼錯誤！\nWrong password!");
         return;
     }
     
@@ -303,11 +303,11 @@ function login() {
 function enterGame() {
     document.getElementById("authBox").style.display = "none";
     document.getElementById("gameUI").style.display = "block";
-    document.getElementById("gameTitle").innerText = `LV.1 玩家: ${currentUser}`;
+    document.getElementById("gameTitle").innerText = `LV.1 玩家 Player: ${currentUser}`;
 }
 
 function logout() {
-    if(confirm("確定要登出並返回標題畫面嗎？")) {
+    if(confirm("確定要登出並返回標題畫面嗎？\nAre you sure you want to log out?")) {
         location.reload();
     }
 }
@@ -322,7 +322,7 @@ function loadUserData() {
             player.fragments = data.fragments || [];
             wrongAnswers = data.wrongAnswers || [];
         } catch (e) {
-            console.error("讀取存檔失敗", e);
+            console.error("讀取存檔失敗 / Failed to load save data", e);
             player.fragments = [];
             wrongAnswers = [];
         }
@@ -368,7 +368,6 @@ function renderSTL(element, stlPath, enableControls = true) {
 
     const loader = new THREE.STLLoader();
     loader.load(stlPath, function(geometry) {
-        // 維持原本的灰階模型金屬質感色調 (0xAAAAAA)
         const material = new THREE.MeshPhongMaterial({ color: 0xAAAAAA, specular: 0x111111, shininess: 200 });
         const mesh = new THREE.Mesh(geometry, material);
         mesh.rotation.x = -Math.PI / 2;
@@ -404,8 +403,8 @@ function renderSTL(element, stlPath, enableControls = true) {
             renderer.render(scene, camera);
         }
     }, undefined, function(error) {
-        console.error('STL 載入失敗:', error);
-        element.innerHTML = '載入模型失敗';
+        console.error('STL 載入失敗 / STL Load Error:', error);
+        element.innerHTML = '載入模型失敗 / Load Failed';
     });
 }
 
@@ -420,27 +419,27 @@ function showHomepage() {
     document.getElementById("fragments").innerHTML = "";
     document.getElementById("buttons").innerHTML = `
         <div>
-            <button onclick="showLevelSelect()">▶ 開始冒險</button>
-            <button onclick="openCollection()">📦 收藏冊</button>
-            <button onclick="showWrongAnswersMenu()">📖 錯題本</button>
+            <button onclick="showLevelSelect()">▶ 開始冒險 / Start Adventure</button>
+            <button onclick="openCollection()">📦 收藏冊 / Collection</button>
+            <button onclick="showWrongAnswersMenu()">📖 錯題本 / Review Book</button>
         </div>
         <br><br>
         <div>
-            <button onclick="logout()">登出遊戲</button>
+            <button onclick="logout()">登出遊戲 / Logout</button>
         </div>
     `;
 }
 
 function showLevelSelect() {
     cleanupDynamicContent();
-    document.getElementById("scene").innerHTML = `<h2 style="font-size: 22px; margin: 15px 0;">選擇冒險關卡</h2>`;
+    document.getElementById("scene").innerHTML = `<h2 style="font-size: 22px; margin: 15px 0;">選擇冒險關卡 / Select Level</h2>`;
     document.getElementById("buttons").innerHTML = `
-        <button onclick="startGame('level1')">關卡（一）</button>
-        <button onclick="startGame('level2')">關卡（二）</button>
-        <button onclick="startGame('level3')">關卡（三）</button>
-        <button onclick="startGame('level4')">關卡（四）</button>
+        <button onclick="startGame('level1')">關卡（一） / Level 1</button>
+        <button onclick="startGame('level2')">關卡（二） / Level 2</button>
+        <button onclick="startGame('level3')">關卡（三） / Level 3</button>
+        <button onclick="startGame('level4')">關卡（四） / Level 4</button>
         <br><br>
-        <button onclick="showHomepage()">返回主選單</button>
+        <button onclick="showHomepage()">返回主選單 / Main Menu</button>
     `;
 }
 
@@ -453,7 +452,7 @@ function startGame(level) {
 
 function showQuestion(level) {
     if (!currentQuestions || currentQuestions.length === 0) {
-        alert("此關卡目前沒有題目！");
+        alert("此關卡目前沒有題目！\nNo questions in this level!");
         showLevelSelect();
         return;
     }
@@ -495,7 +494,7 @@ function answer(btn, ans, level) {
         currentQuestion++;
         if(currentQuestion >= currentQuestions.length){
             let total = currentQuestions.length;
-            alert(`關卡結束！答對 ${correctCount} / ${total} 題`);
+            alert(`關卡結束！答對 ${correctCount} / ${total} 題\nLevel Complete! Correct: ${correctCount} / ${total}`);
 
             if(correctCount === total){
                 const allPossibleFragments = [
@@ -515,12 +514,12 @@ function answer(btn, ans, level) {
 
                     player.fragments.push({ id: Date.now(), file: rewardFile, type: rewardFile });
                     saveUserData();
-                    alert(`🎉 全對！獲得隨機新碎片`);
+                    alert(`🎉 全對！獲得隨機新碎片\n🎉 All Correct! Acquired a new random fragment`);
                 } else {
-                    alert(`🎉 全對！不過所有碎片你都已经收集齊全囉！`);
+                    alert(`🎉 全對！不過所有碎片你都已经收集齊全囉！\n🎉 All Correct! All fragments collected!`);
                 }
             } else {
-                alert(`挑戰失敗～再接再厲！`);
+                alert(`挑戰失敗～再接再厲！\nChallenge Failed ~ Try again!`);
             }
             showLevelSelect();
         } else {
@@ -531,11 +530,11 @@ function answer(btn, ans, level) {
 
 function openCollection() {
     cleanupDynamicContent();
-    document.getElementById("scene").innerHTML = `<div style="font-size: 18px; margin: 15px 0;">點擊碎片預覽模型 / 勾選兩個碎片進行合成！</div>`;
+    document.getElementById("scene").innerHTML = `<div style="font-size: 18px; margin: 15px 0;">點擊碎片預覽模型 / 勾選兩個碎片進行合成！<br><small>Click fragment to preview / Check two fragments to combine!</small></div>`;
     renderFragments();
     document.getElementById("buttons").innerHTML = `
-        <button onclick="combineFragments()">✨ 合成碎片</button>
-        <button onclick="showHomepage()">返回主選單</button>
+        <button onclick="combineFragments()">✨ 合成碎片 / Combine</button>
+        <button onclick="showHomepage()">返回主選單 / Main Menu</button>
     `;
 }
 
@@ -596,7 +595,7 @@ function showFragmentDetail(stlPath) {
 function combineFragments() {
     const selectedCheckboxes = document.querySelectorAll('input[name="fragment-select"]:checked');
     if (selectedCheckboxes.length !== 2) {
-        alert("請精確選擇兩個碎片進行合成！");
+        alert("請精確選擇兩個碎片進行合成！\nPlease select exactly two fragments to combine!");
         return;
     }
 
@@ -621,7 +620,7 @@ function combineFragments() {
         player.fragments.push({ id: Date.now(), file: "./nt/11.stl", type: "./nt/11.stl" });
         saveUserData();
         
-        alert("合成成功！獲得完整牙齒 11！");
+        alert("合成成功！獲得完整牙齒 11！\nCombination Success! Obtained Tooth 11!");
         renderFragments();
    } else if (isFragment12_1 && isFragment12_2) {
         selectedCheckboxes.forEach(checkbox => {
@@ -632,10 +631,10 @@ function combineFragments() {
         player.fragments.push({ id: Date.now(), file: "./nt/12.stl", type: "./nt/12.stl" });
         saveUserData();
         
-        alert("合成成功！獲得完整牙齒 12！");
+        alert("合成成功！獲得完整牙齒 12！\nCombination Success! Obtained Tooth 12!");
         renderFragments();
     } else {
-        alert("合成失敗！碎片配對錯誤！");
+        alert("合成失敗！碎片配對錯誤！\nCombination Failed! Wrong fragment match!");
     }
 }
 
@@ -654,8 +653,8 @@ function showWrongAnswersMenu() {
     document.getElementById("fragments").innerHTML = "";
 
     if (!wrongAnswers || wrongAnswers.length === 0) {
-        document.getElementById("scene").innerHTML = `<div style="font-size: 20px; margin: 20px 0;">錯題本是空的！太棒了，沒有需要複習的錯題！</div>`;
-        document.getElementById("buttons").innerHTML = `<button onclick="showHomepage()">返回主選單</button>`;
+        document.getElementById("scene").innerHTML = `<div style="font-size: 20px; margin: 20px 0;">錯題本是空的！太棒了，沒有需要複習的錯題！<br><small>Review book is empty! Great job!</small></div>`;
+        document.getElementById("buttons").innerHTML = `<button onclick="showHomepage()">返回主選單 / Main Menu</button>`;
         return;
     }
 
@@ -665,15 +664,15 @@ function showWrongAnswersMenu() {
     const count4 = wrongAnswers.filter(q => getQuestionLevel(q) === 'level4').length;
     const totalCount = wrongAnswers.length;
 
-    document.getElementById("scene").innerHTML = `<h2 style="font-size: 22px; margin: 15px 0;">📖 錯題本</h2><p style="font-size: 16px; margin-bottom: 10px;">選擇要特訓的範圍：</p>`;
+    document.getElementById("scene").innerHTML = `<h2 style="font-size: 22px; margin: 15px 0;">📖 錯題本 / Review Book</h2><p style="font-size: 16px; margin-bottom: 10px;">選擇要特訓的範圍 / Select Category:</p>`;
 
     let html = `
-        <button onclick="startWrongPractice('level1')" ${count1 === 0 ? 'disabled' : ''}>第一部分錯題 (${count1})</button><br>
-        <button onclick="startWrongPractice('level2')" ${count2 === 0 ? 'disabled' : ''}>第二部分錯題 (${count2})</button><br>
-        <button onclick="startWrongPractice('level3')" ${count3 === 0 ? 'disabled' : ''}>第三部分錯題 (${count3})</button><br>
-        <button onclick="startWrongPractice('level4')" ${count4 === 0 ? 'disabled' : ''}>第四部分錯題 (${count4})</button><br>
-        <button onclick="startWrongPractice('all')">🔀 全部混合特訓 (${totalCount})</button><br><br>
-        <button onclick="showHomepage()">返回主選單</button>
+        <button onclick="startWrongPractice('level1')" ${count1 === 0 ? 'disabled' : ''}>第一部分錯題 / Level 1 (${count1})</button><br>
+        <button onclick="startWrongPractice('level2')" ${count2 === 0 ? 'disabled' : ''}>第二部分錯題 / Level 2 (${count2})</button><br>
+        <button onclick="startWrongPractice('level3')" ${count3 === 0 ? 'disabled' : ''}>第三部分錯題 / Level 3 (${count3})</button><br>
+        <button onclick="startWrongPractice('level4')" ${count4 === 0 ? 'disabled' : ''}>第四部分錯題 / Level 4 (${count4})</button><br>
+        <button onclick="startWrongPractice('all')">🔀 全部混合特訓 / Mixed Practice (${totalCount})</button><br><br>
+        <button onclick="showHomepage()">返回主選單 / Main Menu</button>
     `;
 
     document.getElementById("buttons").innerHTML = html;
@@ -687,7 +686,7 @@ function startWrongPractice(category) {
     }
 
     if (wrongPracticeList.length === 0) {
-        alert("此範圍沒有錯題！");
+        alert("此範圍沒有錯題！\nNo wrong questions in this category!");
         return;
     }
 
@@ -710,7 +709,7 @@ function showWrongQuestionInteractive() {
         html += `<button class="option-btn" onclick="answerWrongInteractive(this, '${opt}')">${opt}</button>`;
     });
 
-    html += `<br><button onclick="showWrongAnswersMenu()">返回錯題選單</button>`;
+    html += `<br><button onclick="showWrongAnswersMenu()">返回錯題選單 / Back to Menu</button>`;
 
     document.getElementById("buttons").innerHTML = html;
 }
@@ -725,12 +724,12 @@ function answerWrongInteractive(btn, selectedOpt) {
 
     if (selectedOpt !== q.answer) {
         btn.classList.add("wrong");
-        alert(`❌ 答錯了！\n\n【正確答案】${q.answer}\n\n【解析】${q.explanation || '無'}`);
+        alert(`❌ 答錯了！ Wrong!\n\n【正確答案 Correct Answer】${q.answer}\n\n【解析 Explanation】${q.explanation || '無 None'}`);
         
         setTimeout(() => {
             wrongPracticeIndex++;
             if (wrongPracticeIndex >= wrongPracticeList.length) {
-                alert("特訓結束！");
+                alert("特訓結束！ Practice Complete!");
                 showWrongAnswersMenu();
             } else {
                 showWrongQuestionInteractive();
@@ -738,7 +737,7 @@ function answerWrongInteractive(btn, selectedOpt) {
         }, 1200);
 
     } else {
-        alert("🎉 答對了！此題已從錯題本中永久消除！");
+        alert("🎉 答對了！此題已從錯題本中永久消除！\n🎉 Correct! Removed from review book!");
 
         wrongAnswers = wrongAnswers.filter(item => item.question !== q.question);
         saveUserData();
@@ -747,7 +746,7 @@ function answerWrongInteractive(btn, selectedOpt) {
 
         setTimeout(() => {
             if (wrongPracticeList.length === 0) {
-                alert("✨ 太棒了！此範圍錯題全部清空！");
+                alert("✨ 太棒了！此範圍錯題全部清空！\n✨ Awesome! All wrong questions cleared!");
                 showWrongAnswersMenu();
                 return;
             }
